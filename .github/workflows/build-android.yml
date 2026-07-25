@@ -24,17 +24,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Build Android
+      - name: Install and Build
         run: |
-          npx cap init "下注计算器" com.betting.calculator --web-dir src
+          npm install
+          npx cap init "calculator" "com.betting.calculator" --web-dir src
           npx cap add android
           npx cap sync android
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
