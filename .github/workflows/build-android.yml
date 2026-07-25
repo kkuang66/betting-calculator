@@ -24,23 +24,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Capacitor CLI
-        run: npm install -g @capacitor/cli
-
       - name: Install dependencies
         run: npm install
 
-      - name: Init Capacitor
-        run: npx cap init "下注计算器" com.betting.calculator --web-dir src
-
-      - name: Add Android
-        run: npx cap add android
-
-      - name: Sync
-        run: npx cap sync android
-
-      - name: Build APK
+      - name: Build Android
         run: |
+          npx cap init "下注计算器" com.betting.calculator --web-dir src
+          npx cap add android
+          npx cap sync android
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
