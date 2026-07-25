@@ -1,0 +1,496 @@
+/* 全局样式 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --primary: #667eea;
+    --primary-dark: #5a6fd6;
+    --success: #4CAF50;
+    --danger: #f44336;
+    --warning: #FF9800;
+    --bg: #f5f5f5;
+    --card-bg: #ffffff;
+    --text: #333333;
+    --text-light: #666666;
+    --border: #e0e0e0;
+    --shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+}
+
+/* 顶部导航 */
+.header {
+    background: linear-gradient(135deg, var(--primary), #764ba2);
+    color: white;
+    padding: 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.header h1 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* 主内容区 */
+.main-content {
+    padding: 16px;
+    padding-bottom: 80px;
+    min-height: calc(100vh - 60px - 64px);
+}
+
+/* Tab内容 */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* 卡片 */
+.card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+}
+
+.card h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+/* 输入框 */
+textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+textarea:focus {
+    border-color: var(--primary);
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input[type="number"]:focus {
+    border-color: var(--primary);
+}
+
+/* 按钮 */
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary), #764ba2);
+    color: white;
+    margin-top: 12px;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+    flex: 1;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-secondary {
+    background: #9E9E9E;
+    color: white;
+    width: 100%;
+    margin-top: 12px;
+}
+
+/* 号码输入 */
+.number-inputs {
+    margin-bottom: 12px;
+}
+
+.input-group {
+    margin-bottom: 12px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.number-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+
+.number-row input {
+    text-align: center;
+    padding: 12px 4px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.te-ma-input {
+    max-width: 200px;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    text-align: center;
+    color: var(--danger) !important;
+    border-color: var(--danger) !important;
+}
+
+/* 反馈区域 */
+.feedback-card {
+    background: #f8f9fa;
+}
+
+.feedback-question {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 12px;
+}
+
+.feedback-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+/* 结果卡片 */
+.result-card {
+    background: linear-gradient(135deg, #667eea11, #764ba211);
+    border: 1px solid #667eea33;
+}
+
+.profit-card {
+    background: linear-gradient(135deg, #4CAF5011, #8BC34A11);
+    border: 1px solid #4CAF5033;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-label {
+    color: var(--text-light);
+}
+
+.result-value {
+    font-weight: 600;
+}
+
+.result-value.win {
+    color: var(--success);
+}
+
+.result-value.lose {
+    color: var(--danger);
+}
+
+/* 生肖表格 */
+.zodiac-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.zodiac-item {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.zodiac-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.zodiac-numbers {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+/* 历史列表 */
+.history-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.history-item {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-text {
+    font-size: 14px;
+}
+
+.history-result {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 4px;
+}
+
+.history-time {
+    font-size: 12px;
+    color: #999;
+}
+
+.empty-text {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+/* 设置列表 */
+.settings-list {
+    margin-bottom: 12px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item label {
+    font-size: 14px;
+    color: var(--text);
+}
+
+.setting-item input {
+    width: 100px;
+    text-align: center;
+    padding: 8px;
+    font-size: 16px;
+}
+
+/* AI统计 */
+.ai-stats {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+}
+
+.stat-label {
+    color: var(--text-light);
+}
+
+.stat-value {
+    font-weight: 600;
+}
+
+/* 底部Tab栏 */
+.tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 12px;
+    background: none;
+    color: #999;
+    font-size: 12px;
+    border: none;
+    box-shadow: none;
+}
+
+.tab-item.active {
+    color: var(--primary);
+}
+
+.tab-icon {
+    font-size: 24px;
+    margin-bottom: 2px;
+}
+
+.tab-label {
+    font-size: 11px;
+}
+
+/* 弹窗 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content h3 {
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 18px;
+}
+
+.modal-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.modal-option {
+    padding: 12px 8px;
+    background: #f5f5f5;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.modal-option:active {
+    border-color: var(--primary);
+    background: #667eea11;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    z-index: 1000;
+    animation: toastIn 0.3s ease;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* 响应式 */
+@media (max-width: 360px) {
+    .number-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .modal-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
