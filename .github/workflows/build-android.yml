@@ -2,43 +2,157 @@ name: Build Android APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-java@v4
         with:
-          node-version: '18'
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install and Build
+          distribution: temurin
+          java-version: 17
+      
+      - name: Create Android Project
         run: |
-          npm install
-          npx cap init "calculator" "com.betting.calculator" --web-dir src
-          npx cap add android
-          npx cap sync android
+          mkdir -p android/app/src/main/java/com/betting/calculator
+          mkdir -p android/app/src/main/res/layout
+          mkdir -p android/app/src/main/res/values
+          mkdir -p android/app/src/main/assets
+          
+          # Copy web files
+          cp -r src/* android/app/src/main/assets/
+          
+          # Create build.gradle
+          cat > android/build.gradle << 'EOF'
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.1.0'
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
+          
+          # Create app/build.gradle
+          cat > android/app/build.gradle << 'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+          android {
+              namespace 'com.betting.calculator'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.betting.calculator"
+                  minSdk 24
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+              buildTypes {
+                  release {
+                      minifyEnabled false
+                  }
+              }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_1_8
+                  targetCompatibility JavaVersion.VERSION_1_8
+              }
+          }
+          dependencies {
+              implementation 'androidx.appcompat:appcompat:1.6.1'
+              implementation 'androidx.webkit:webkit:1.8.0'
+          }
+          EOF
+          
+          # Create settings.gradle
+          cat > android/settings.gradle << 'EOF'
+          rootProject.name = "betting-calculator"
+          include ':app'
+          EOF
+          
+          # Create MainActivity
+          cat > android/app/src/main/java/com/betting/calculator/MainActivity.java << 'EOF'
+          package com.betting.calculator;
+          
+          import android.app.Activity;
+          import android.os.Bundle;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          import android.webkit.WebSettings;
+          
+          public class MainActivity extends Activity {
+              private WebView webView;
+              
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  
+                  webView = new WebView(this);
+                  setContentView(webView);
+                  
+                  WebSettings settings = webView.getSettings();
+                  settings.setJavaScriptEnabled(true);
+                  settings.setDomStorageEnabled(true);
+                  settings.setAllowFileAccess(true);
+                  
+                  webView.setWebViewClient(new WebViewClient());
+                  webView.loadUrl("file:///android_asset/index.html");
+              }
+              
+              @Override
+              public void onBackPressed() {
+                  if (webView.canGoBack()) {
+                      webView.goBack();
+                  } else {
+                      super.onBackPressed();
+                  }
+              }
+          }
+          EOF
+          
+          # Create AndroidManifest.xml
+          cat > android/app/src/main/AndroidManifest.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <application
+                  android:allowBackup="true"
+                  android:label="下注计算器"
+                  android:theme="@android:style/Theme.NoTitleBar">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+          
+          # Create gradle wrapper
+          cd android
+          gradle wrapper --gradle-version 8.3
+      
+      - name: Build Debug APK
+        run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-
+      
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
