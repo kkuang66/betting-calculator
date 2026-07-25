@@ -7,32 +7,25 @@ on:
 
 jobs:
   build:
-    name: Build APK
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       
-      - name: Setup Node.js 18
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 18
       
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Setup Java 17
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
       
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
-      
-      - name: Build Debug APK
+      - name: Install and Build
         run: |
+          npm install
           npx cap init "下注计算器" com.betting.calculator --web-dir src
           npx cap add android
           npx cap sync android
@@ -40,24 +33,8 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
       
-      - name: Upload Debug APK
+      - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
-          name: debug-apk
+          name: apk
           path: android/app/build/outputs/apk/debug/*.apk
-          retention-days: 30
-      
-      - name: Create Release
-        if: success()
-        uses: softprops/action-gh-release@v1
-        with:
-          files: android/app/build/outputs/apk/debug/*.apk
-          tag_name: v${{ github.run_number }}
-          name: Release v${{ github.run_number }}
-          body: |
-            ## 自动构建 APK
-            
-            构建时间: ${{ github.event.head_commit.timestamp }}
-            提交信息: ${{ github.event.head_commit.message }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
