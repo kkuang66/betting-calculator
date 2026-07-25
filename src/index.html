@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>下注计算器</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="header">
+        <h1>🎯 下注计算器</h1>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- Tab: 计算器 -->
+        <div id="tab-calc" class="tab-content active">
+            <div class="card">
+                <h2>📝 输入下注信息</h2>
+                <textarea id="betInput" placeholder="例如：&#10;狗虎猴三连肖100&#10;平特一肖猴800米&#10;特码33号200元&#10;龙虎蛇各100元"></textarea>
+                <button id="btnParse" class="btn-primary">🎯 解析</button>
+            </div>
+
+            <div id="resultCard" class="card result-card" style="display:none;">
+                <h2>📊 解析结果</h2>
+                <div id="resultContent"></div>
+            </div>
+
+            <div id="feedbackCard" class="card" style="display:none;">
+                <h2>💬 反馈</h2>
+                <p class="feedback-question">预测是否正确？</p>
+                <div class="feedback-buttons">
+                    <button id="btnCorrect" class="btn-success">✅ 正确</button>
+                    <button id="btnWrong" class="btn-danger">❌ 纠正</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📋 开奖号码</h2>
+                <div class="number-inputs">
+                    <div class="input-group">
+                        <label>平码</label>
+                        <div class="number-row">
+                            <input type="number" id="ping1" placeholder="1" min="1" max="49">
+                            <input type="number" id="ping2" placeholder="2" min="1" max="49">
+                            <input type="number" id="ping3" placeholder="3" min="1" max="49">
+                            <input type="number" id="ping4" placeholder="4" min="1" max="49">
+                            <input type="number" id="ping5" placeholder="5" min="1" max="49">
+                            <input type="number" id="ping6" placeholder="6" min="1" max="49">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>特码</label>
+                        <input type="number" id="teMa" placeholder="特码" min="1" max="49" class="te-ma-input">
+                    </div>
+                </div>
+                <button id="btnCalculate" class="btn-primary">💰 计算收益</button>
+            </div>
+
+            <div id="profitCard" class="card profit-card" style="display:none;">
+                <h2>💰 收益计算</h2>
+                <div id="profitContent"></div>
+            </div>
+        </div>
+
+        <!-- Tab: 生肖表 -->
+        <div id="tab-zodiac" class="tab-content">
+            <div class="card">
+                <h2>🐲 生肖对照表</h2>
+                <div class="zodiac-grid" id="zodiacGrid"></div>
+            </div>
+        </div>
+
+        <!-- Tab: 历史 -->
+        <div id="tab-history" class="tab-content">
+            <div class="card">
+                <h2>📜 历史记录</h2>
+                <div id="historyList" class="history-list">
+                    <p class="empty-text">暂无记录</p>
+                </div>
+                <button id="btnClearHistory" class="btn-danger" style="margin-top:12px;">🗑️ 清空历史</button>
+            </div>
+        </div>
+
+        <!-- Tab: 设置 -->
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <h2>⚙️ 赔率设置</h2>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <label>特码赔率</label>
+                        <input type="number" id="oddsTe" value="49" step="0.1">
+                    </div>
+                    <div class="setting-item">
+                        <label>平码赔率</label>
+                        <input type="number" id="oddsPing" value="49" step="0.1">
+                    </div>
+                    <div class="setting-item">
+                        <label>特肖赔率</label>
+                        <input type="number" id="oddsTeZodiac" value="4.7" step="0.1">
+                    </div>
+                    <div class="setting-item">
+                        <label>平肖赔率</label>
+                        <input type="number" id="oddsPingZodiac" value="4.7" step="0.1">
+                    </div>
+                    <div class="setting-item">
+                        <label>二有赔率</label>
+                        <input type="number" id="oddsYou2" value="4" step="0.1">
+                    </div>
+                    <div class="setting-item">
+                        <label>三有赔率</label>
+                        <input type="number" id="oddsYou3" value="10" step="0.1">
+                    </div>
+                    <div class="setting-item">
+                        <label>四有赔率</label>
+                        <input type="number" id="oddsYou4" value="30" step="0.1">
+                    </div>
+                    <div class="setting-item">
+                        <label>五有赔率</label>
+                        <input type="number" id="oddsYou5" value="100" step="0.1">
+                    </div>
+                </div>
+                <button id="btnSaveSettings" class="btn-primary">💾 保存设置</button>
+            </div>
+
+            <div class="card">
+                <h2>🧠 AI学习统计</h2>
+                <div id="aiStats" class="ai-stats">
+                    <p>加载中...</p>
+                </div>
+                <button id="btnResetAI" class="btn-danger" style="margin-top:12px;">🔄 重置AI学习</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部Tab栏 -->
+    <nav class="tab-bar">
+        <button class="tab-item active" data-tab="tab-calc">
+            <span class="tab-icon">🧮</span>
+            <span class="tab-label">计算</span>
+        </button>
+        <button class="tab-item" data-tab="tab-zodiac">
+            <span class="tab-icon">🐲</span>
+            <span class="tab-label">生肖</span>
+        </button>
+        <button class="tab-item" data-tab="tab-history">
+            <span class="tab-icon">📜</span>
+            <span class="tab-label">历史</span>
+        </button>
+        <button class="tab-item" data-tab="tab-settings">
+            <span class="tab-icon">⚙️</span>
+            <span class="tab-label">设置</span>
+        </button>
+    </nav>
+
+    <!-- 纠正弹窗 -->
+    <div id="correctionModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>选择正确玩法</h3>
+            <div class="modal-options">
+                <button class="modal-option" data-intent="number_bet">🔢 号码玩法</button>
+                <button class="modal-option" data-intent="te_number">🎯 特码玩法</button>
+                <button class="modal-option" data-intent="zodiac_bet">🐲 生肖玩法</button>
+                <button class="modal-option" data-intent="te_zodiac">⭐ 特肖玩法</button>
+                <button class="modal-option" data-intent="you_2">2️⃣ 二有</button>
+                <button class="modal-option" data-intent="you_3">3️⃣ 三有</button>
+                <button class="modal-option" data-intent="you_4">4️⃣ 四有</button>
+                <button class="modal-option" data-intent="you_5">5️⃣ 五有</button>
+                <button class="modal-option" data-intent="fu_you">🔄 复式玩法</button>
+            </div>
+            <button id="btnCloseModal" class="btn-secondary">取消</button>
+        </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div id="toast" class="toast" style="display:none;"></div>
+
+    <script src="assets/js/zodiac.js"></script>
+    <script src="assets/js/parser.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
