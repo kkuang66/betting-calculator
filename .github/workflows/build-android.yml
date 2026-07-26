@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build APK
 
 on:
   push:
@@ -16,145 +16,35 @@ jobs:
           distribution: temurin
           java-version: 17
       
-      - name: Create Android Project
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Build
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
         run: |
-          mkdir -p android/app/src/main/java/com/betting/calculator
-          mkdir -p android/app/src/main/res/layout
-          mkdir -p android/app/src/main/res/values
-          mkdir -p android/app/src/main/assets
+          # Create project structure
+          mkdir -p app/src/main/java/com/app
+          mkdir -p app/src/main/res/values
+          mkdir -p app/src/main/assets
           
           # Copy web files
-          cp -r src/* android/app/src/main/assets/
+          cp -r src/* app/src/main/assets/
           
-          # Create build.gradle
-          cat > android/build.gradle << 'EOF'
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.1.0'
-              }
-          }
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-          EOF
-          
-          # Create app/build.gradle
-          cat > android/app/build.gradle << 'EOF'
-          plugins {
-              id 'com.android.application'
-          }
-          android {
-              namespace 'com.betting.calculator'
-              compileSdk 34
-              defaultConfig {
-                  applicationId "com.betting.calculator"
-                  minSdk 24
-                  targetSdk 34
-                  versionCode 1
-                  versionName "1.0"
-              }
-              buildTypes {
-                  release {
-                      minifyEnabled false
-                  }
-              }
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_1_8
-                  targetCompatibility JavaVersion.VERSION_1_8
-              }
-          }
-          dependencies {
-              implementation 'androidx.appcompat:appcompat:1.6.1'
-              implementation 'androidx.webkit:webkit:1.8.0'
-          }
-          EOF
-          
-          # Create settings.gradle
-          cat > android/settings.gradle << 'EOF'
-          rootProject.name = "betting-calculator"
-          include ':app'
-          EOF
-          
-          # Create MainActivity
-          cat > android/app/src/main/java/com/betting/calculator/MainActivity.java << 'EOF'
-          package com.betting.calculator;
-          
-          import android.app.Activity;
-          import android.os.Bundle;
-          import android.webkit.WebView;
-          import android.webkit.WebViewClient;
-          import android.webkit.WebSettings;
-          
-          public class MainActivity extends Activity {
-              private WebView webView;
-              
-              @Override
-              protected void onCreate(Bundle savedInstanceState) {
-                  super.onCreate(savedInstanceState);
-                  
-                  webView = new WebView(this);
-                  setContentView(webView);
-                  
-                  WebSettings settings = webView.getSettings();
-                  settings.setJavaScriptEnabled(true);
-                  settings.setDomStorageEnabled(true);
-                  settings.setAllowFileAccess(true);
-                  
-                  webView.setWebViewClient(new WebViewClient());
-                  webView.loadUrl("file:///android_asset/index.html");
-              }
-              
-              @Override
-              public void onBackPressed() {
-                  if (webView.canGoBack()) {
-                      webView.goBack();
-                  } else {
-                      super.onBackPressed();
-                  }
-              }
-          }
-          EOF
-          
-          # Create AndroidManifest.xml
-          cat > android/app/src/main/AndroidManifest.xml << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <uses-permission android:name="android.permission.INTERNET"/>
-              <application
-                  android:allowBackup="true"
-                  android:label="下注计算器"
-                  android:theme="@android:style/Theme.NoTitleBar">
-                  <activity
-                      android:name=".MainActivity"
-                      android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN"/>
-                          <category android:name="android.intent.category.LAUNCHER"/>
-                      </intent-filter>
-                  </activity>
-              </application>
-          </manifest>
-          EOF
+          # Create build files
+          echo 'plugins { id "com.android.application" version "8.1.0" }' > build.gradle
+          echo 'android { namespace "com.app"; compileSdk 34; defaultConfig { applicationId "com.app"; minSdk 24; targetSdk 34; versionCode 1; versionName "1.0" } }' >> app/build.gradle
+          echo 'rootProject.name = "app"' > settings.gradle
+          echo 'include ":app"' >> settings.gradle
           
           # Create gradle wrapper
-          cd android
-          gradle wrapper --gradle-version 8.3
-      
-      - name: Build Debug APK
-        run: |
-          cd android
+          gradle wrapper
+          
+          # Build
           chmod +x gradlew
           ./gradlew assembleDebug
       
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: betting-calculator
-          path: android/app/build/outputs/apk/debug/*.apk
+          name: apk
+          path: app/build/outputs/apk/debug/*.apk
