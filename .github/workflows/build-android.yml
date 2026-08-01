@@ -11,40 +11,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup
-        run: |
-          # Install Android command line tools
-          sudo apt-get update
-          sudo apt-get install -y wget unzip
-          
-          # Download Android SDK
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          mkdir -p ~/android-sdk/cmdline-tools
-          mv cmdline-tools ~/android-sdk/cmdline-tools/latest
-          
-          # Set environment
-          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
-          
-          # Accept licenses
-          yes | sdkmanager --licenses
-          sdkmanager "platforms;android-33" "build-tools;33.0.2"
+      - name: Setup Android
+        uses: amyu/setup-android@v3
       
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
       
-      - name: Build
+      - name: Create Project
         run: |
           mkdir -p app/src/main/java/com/app
           mkdir -p app/src/main/assets
           cp -r src/* app/src/main/assets/
           
-          cat > app/src/main/java/com/app/MainActivity.java << 'EOF'
+          cat > app/src/main/java/com/app/MainActivity.java << 'JAVA'
           package com.app;
           import android.app.Activity;
           import android.os.Bundle;
@@ -62,9 +44,9 @@ jobs:
                   w.loadUrl("file:///android_asset/index.html");
               }
           }
-          EOF
+          JAVA
           
-          cat > app/src/main/AndroidManifest.xml << 'EOF'
+          cat > app/src/main/AndroidManifest.xml << 'XML'
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <application android:label="Calculator">
@@ -76,17 +58,17 @@ jobs:
                   </activity>
               </application>
           </manifest>
-          EOF
+          XML
           
-          cat > build.gradle << 'EOF'
+          cat > build.gradle << 'GRADLE'
           buildscript {
               repositories { google(); mavenCentral() }
               dependencies { classpath "com.android.tools.build:gradle:7.4.2" }
           }
           allprojects { repositories { google(); mavenCentral() } }
-          EOF
+          GRADLE
           
-          cat > app/build.gradle << 'EOF'
+          cat > app/build.gradle << 'APPGRADLE'
           apply plugin: "com.android.application"
           android {
               namespace "com.app"
@@ -94,7 +76,7 @@ jobs:
               defaultConfig { applicationId "com.app"; minSdk 24; targetSdk 33 }
           }
           dependencies { implementation "androidx.appcompat:appcompat:1.6.1" }
-          EOF
+          APPGRADLE
           
           echo 'rootProject.name="app"' > settings.gradle
           echo 'include ":app"' >> settings.gradle
@@ -103,7 +85,8 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
       
-      - uses: actions/upload-artifact@v4
+      - name: Upload
+        uses: actions/upload-artifact@v4
         with:
           name: apk
           path: app/build/outputs/apk/debug/*.apk
